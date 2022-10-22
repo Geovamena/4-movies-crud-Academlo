@@ -1,12 +1,12 @@
 const { Sequelize } = require('sequelize')
+const config = require('../config')
 
 const db = new Sequelize({
-    dialect: 'postgres',
-    host: 'localhost',
-    username: 'postgres',
-    password: '110549630-9', 
-    database: 'movies_crud'
-
+    dialect: 'postgres', 
+    host: config.db.host, // variable de entorno del host 
+    username: config.db.username, // variable de entorno del usuario
+    password: config.db.password, // variable de entorno de la contrasena
+    database: config.db.name // variable de entorno de la base de datos
 })
 
 module.exports = db
