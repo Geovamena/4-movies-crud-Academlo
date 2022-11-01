@@ -1,4 +1,4 @@
-const { response } = require("express");
+
 const moviesControllers = require("./movies.controller");
 
 const getAllMovies = (req, res) => {
@@ -55,13 +55,43 @@ const patchMovie = (req, res) => {
                     message: `User with id: ${id}, edited succesfully!`,
                 });
             } else {
-                res.status(400).json({ message: "invalid ID" });
+                res.status(404).json({ message: "invalid ID" });
             }
         })
         .catch((error) => {
             res.status(400).json({ message: error.message });
         });
 };
+
+const putMovie = (req, res) => {
+    const id = req.params.id
+    const { name, genre, duration, releaseDate } = req.body
+
+    //? Este if es para validar los datos, y generar error si no vienen todos los necesarios
+    if (name && genre && duration && releaseDate) {
+        moviesControllers.editMovie(id, { name, genre, duration, releaseDate })
+            .then((response) => {
+                //? Este if valida si una pelicula existe o no (valid or Invalid ID)
+                if (response[0]) {
+                    res.status(200).json({ message: `Movie with ID: ${id}, edited successfully!` })
+                } else {
+                    res.status(404).json({ message: 'Invalid ID' })
+                }
+            })
+            .catch(err => {
+                res.status(400).json({ message: err.message })
+            })
+    } else {
+        res.status(400).json({
+            message: 'Missing data', fields: {
+                name: 'string',
+                genre: 'string',
+                duration: 'integer',
+                releaseDate: 'YYYY/MM/DD'
+            }
+        })
+    }
+}
 
 const deleteMovie = (req, res) => {
     const id = req.params.id;
@@ -70,7 +100,7 @@ const deleteMovie = (req, res) => {
             if (response) {
                 res.status(200).json(response);
             } else {
-                res.status(400).json({message: 'Invalid ID'})
+                res.status(400).json({ message: 'Invalid ID' })
             }
         })
         .catch((err) => {
@@ -83,5 +113,6 @@ module.exports = {
     getMovieById,
     postMovies,
     patchMovie,
+    putMovie,
     deleteMovie
 };
